@@ -17,63 +17,78 @@ import { Icon } from "astro-icon/components";
 	<div id="search-results" class="search-results mt-4"></div>
 </div>
 
-<script>
-	// Cette fonction s'exécute après le chargement de la page
-	document.addEventListener('DOMContentLoaded', async () => {
-		// Importation dynamique de Pagefind
-		const { search } = await import('/pagefind/pagefind.js');
-		
-		const searchInput = document.getElementById('search-input');
-		const searchResults = document.getElementById('search-results');
-		
-		if (!searchInput || !searchResults) return;
-		
-		let debounceTimeout;
-		
-		searchInput.addEventListener('input', (e) => {
-			clearTimeout(debounceTimeout);
+<script is:inline>
+	// Fonction qui sera appelée lorsque Pagefind sera disponible (après le build)
+	document.addEventListener('DOMContentLoaded', function() {
+		// On attend un peu que la page soit chargée complètement
+		setTimeout(function() {
+			const searchInput = document.getElementById('search-input');
+			const searchResults = document.getElementById('search-results');
 			
-			const query = e.target.value;
-			
-			if (query.length < 3) {
-				searchResults.innerHTML = '';
-				return;
+			if (!searchInput || !searchResults) return;
+
+			// On vérifie si pagefind est disponible (après le build)
+			if (window.location.pathname.includes('/recherche') && typeof window.pagefind !== 'undefined') {
+				let debounceTimeout;
+				
+				searchInput.addEventListener('input', function(e) {
+					clearTimeout(debounceTimeout);
+					
+					const query = e.target.value;
+					
+					if (!query || query.length < 3) {
+						searchResults.innerHTML = '';
+						return;
+					}
+					
+					debounceTimeout = setTimeout(function() {
+						// Utiliser l'API globale de pagefind qui sera disponible après le build
+						window.pagefind.search(query).then(function(results) {
+							if (!results.results || results.results.length === 0) {
+								searchResults.innerHTML = '<p>Aucun résultat trouvé</p>';
+								return;
+							}
+							
+							const fragment = document.createDocumentFragment();
+							let loadedCount = 0;
+							
+							results.results.forEach(function(result) {
+								result.data().then(function(data) {
+									const resultElement = document.createElement('div');
+									resultElement.className = 'search-result p-3 rounded-md hover:bg-special-lighter mb-2';
+									
+									const titleElement = document.createElement('a');
+									titleElement.href = data.url;
+									titleElement.className = 'font-medium text-accent-two hover:underline';
+									titleElement.textContent = data.meta.title;
+									
+									const excerptElement = document.createElement('p');
+									excerptElement.className = 'text-sm mt-1';
+									excerptElement.textContent = data.excerpt;
+									
+									resultElement.appendChild(titleElement);
+									resultElement.appendChild(excerptElement);
+									fragment.appendChild(resultElement);
+									
+									loadedCount++;
+									
+									if (loadedCount === results.results.length) {
+										searchResults.innerHTML = '';
+										searchResults.appendChild(fragment);
+									}
+								});
+							});
+						}).catch(function(error) {
+							console.error('Erreur de recherche:', error);
+							searchResults.innerHTML = '<p>Une erreur est survenue pendant la recherche</p>';
+						});
+					}, 300);
+				});
+			} else {
+				searchInput.placeholder = "La recherche sera disponible après la construction du site";
+				searchInput.disabled = true;
 			}
-			
-			debounceTimeout = setTimeout(async () => {
-				const results = await search.search(query);
-				
-				if (results.results.length === 0) {
-					searchResults.innerHTML = '<p>Aucun résultat trouvé</p>';
-					return;
-				}
-				
-				const fragment = document.createDocumentFragment();
-				
-				for (const result of results.results) {
-					const data = await result.data();
-					
-					const resultElement = document.createElement('div');
-					resultElement.className = 'search-result p-3 rounded-md hover:bg-special-lighter mb-2';
-					
-					const titleElement = document.createElement('a');
-					titleElement.href = data.url;
-					titleElement.className = 'font-medium text-accent-two hover:underline';
-					titleElement.textContent = data.meta.title;
-					
-					const excerptElement = document.createElement('p');
-					excerptElement.className = 'text-sm mt-1';
-					excerptElement.textContent = data.excerpt;
-					
-					resultElement.appendChild(titleElement);
-					resultElement.appendChild(excerptElement);
-					fragment.appendChild(resultElement);
-				}
-				
-				searchResults.innerHTML = '';
-				searchResults.appendChild(fragment);
-			}, 300);
-		});
+		}, 1000);
 	});
 </script>
 

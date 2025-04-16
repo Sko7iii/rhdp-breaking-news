@@ -1,6 +1,6 @@
 [build]
   publish = "dist"
-  command = "npm install && npm run build && npx pagefind --site dist"
+  command = "npm install && npm run build && node node_modules/.bin/pagefind --site dist"
 
 [[redirects]]
   from = "/admin"

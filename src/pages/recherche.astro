@@ -17,15 +17,13 @@ const meta = {
 		<Search />
 	</div>
 	
-	<script>
-		// Cette fonction charge les ressources de Pagefind lors du chargement de la page
-		document.addEventListener('DOMContentLoaded', async () => {
-			try {
-				// Préchargement des ressources Pagefind
-				await import('/pagefind/pagefind.js');
-			} catch (error) {
-				console.error('Erreur lors du chargement de Pagefind:', error);
-			}
-		});
+	<script is:inline>
+		// Le script pagefind.js sera disponible après le build
+		// Nous n'essayons pas de l'importer directement ici pour éviter les erreurs pendant le build
+		if (typeof window !== 'undefined') {
+			document.addEventListener('DOMContentLoaded', function() {
+				console.log('La recherche sera disponible après le déploiement complet du site');
+			});
+		}
 	</script>
 </PageLayout> 

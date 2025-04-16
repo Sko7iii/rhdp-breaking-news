@@ -10,11 +10,14 @@ import { Icon } from "astro-icon/components";
 		<input 
 			type="text" 
 			id="search-input" 
-			placeholder="Rechercher..." 
+			placeholder="Recherche disponible après déploiement" 
 			class="w-full p-2 rounded-md border border-special-lighter bg-special-lightest focus:outline-none focus:ring-2 focus:ring-accent-base"
+			disabled
 		/>
 	</div>
-	<div id="search-results" class="search-results mt-4"></div>
+	<div id="search-results" class="search-results mt-4">
+		<p>La recherche sera disponible une fois le site déployé.</p>
+	</div>
 </div>
 
 <script is:inline>
@@ -102,5 +105,8 @@ import { Icon } from "astro-icon/components";
 	.search-results {
 		max-height: 500px;
 		overflow-y: auto;
+		color: #888;
+		font-style: italic;
+		text-align: center;
 	}
 </style>

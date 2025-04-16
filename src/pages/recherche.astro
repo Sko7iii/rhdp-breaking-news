@@ -1,0 +1,31 @@
+---
+import PageLayout from "@/layouts/Base.astro";
+import Search from "@/components/Search.astro";
+
+const meta = {
+	description: "Rechercher sur RHDP Breaking News",
+	title: "Recherche",
+};
+---
+
+<PageLayout meta={meta}>
+	<div class="space-y-6">
+		<h1 class="title">Recherche</h1>
+		
+		<p class="mb-6">Entrez votre recherche ci-dessous pour trouver des articles et des vidéos sur notre site.</p>
+		
+		<Search />
+	</div>
+	
+	<script>
+		// Cette fonction charge les ressources de Pagefind lors du chargement de la page
+		document.addEventListener('DOMContentLoaded', async () => {
+			try {
+				// Préchargement des ressources Pagefind
+				await import('/pagefind/pagefind.js');
+			} catch (error) {
+				console.error('Erreur lors du chargement de Pagefind:', error);
+			}
+		});
+	</script>
+</PageLayout> 

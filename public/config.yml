@@ -1,0 +1,47 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "public/uploads"
+public_folder: "/uploads"
+
+locale: 'fr'
+
+collections:
+  - name: "actualites"
+    label: "Actualités"
+    folder: "src/content/actualites"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Titre", name: "title", widget: "string" }
+      - { label: "Résumé", name: "summary", widget: "text" }
+      - { label: "Catégorie", name: "category", widget: "string" }
+      - { label: "Tags", name: "tags", widget: "list", default: [] }
+      - { label: "Auteur", name: "author", widget: "string" }
+      - { label: "Image", name: "image", widget: "image" }
+      - { label: "Contenu", name: "body", widget: "markdown" }
+
+  - name: "videos"
+    label: "Vidéos"
+    folder: "src/content/videos"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Titre", name: "title", widget: "string" }
+      - { label: "Vignette", name: "thumbnail", widget: "image" }
+      - { label: "Lien YouTube", name: "youtube", widget: "string" }
+      - { label: "Description", name: "body", widget: "markdown" }
+
+  - name: "notes"
+    label: "Notes"
+    folder: "src/content/note"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Titre", name: "title", widget: "string" }
+      - { label: "Description", name: "description", widget: "text" }
+      - { label: "Date de publication", name: "publishDate", widget: "datetime", format: "YYYY-MM-DD" }
+      - { label: "Auteur", name: "author", widget: "string", default: "Admin" }
+      - { label: "Tags", name: "tags", widget: "list", default: ["note"] }
+      - { label: "Contenu", name: "body", widget: "markdown" } 

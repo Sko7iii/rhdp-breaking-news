@@ -5,6 +5,7 @@ import tailwind from "@astrojs/tailwind";
 import icon from "astro-icon";
 import robotsTxt from "astro-robots-txt";
 import webmanifest from "astro-webmanifest";
+import pagefind from "astro-pagefind";
 import { defineConfig, envField } from "astro/config";
 import { siteConfig } from "./src/site.config";
 
@@ -37,6 +38,7 @@ export default defineConfig({
     sitemap(),
     mdx(),
     robotsTxt(),
+    pagefind(),
     webmanifest({
       // See: https://github.com/alextim/astro-lib/blob/main/packages/astro-webmanifest/README.md
       /**
@@ -115,7 +117,7 @@ export default defineConfig({
   // https://docs.astro.build/en/guides/prefetch/
   prefetch: true,
   // ! Please remember to replace the following site property with your own domain
-  site: "http://astrocitrus.artemkutsan.pp.ua/",
+  site: "https://www.rhdp-breaking-news.ci/",
   vite: {
     build: {
       sourcemap: true, // Source maps generation

@@ -1,26 +1,29 @@
 ---
-import { type CollectionEntry, getCollection } from "astro:content";
+import { getCollection } from "astro:content";
 import SocialList from "@/components/SocialList.astro";
-import PostPreview from "@/components/blog/PostPreview.astro";
-import Note from "@/components/note/Note.astro";
-import { getAllPosts } from "@/data/post";
 import PageLayout from "@/layouts/Base.astro";
+import { Icon } from "astro-icon/components";
 import { collectionDateSort } from "@/utils/date";
 
-// Posts
-const MAX_POSTS = 10;
-const allPosts = await getAllPosts();
-const allPostsByDate = allPosts
-	.sort(collectionDateSort)
-	.slice(0, MAX_POSTS) as CollectionEntry<"post">[];
+// Récupération des derniers articles
+const MAX_ARTICLES = 3;
+const allActualites = await getCollection("actualites");
+const latestActualites = allActualites.sort(collectionDateSort).slice(0, MAX_ARTICLES);
 
-// Notes
-const MAX_NOTES = 2;
-const allNotes = await getCollection("note");
-const latestNotes = allNotes.sort(collectionDateSort).slice(0, MAX_NOTES);
+// Récupération des dernières vidéos
+const MAX_VIDEOS = 3;
+const allVideos = await getCollection("videos");
+const latestVideos = allVideos.sort(collectionDateSort).slice(0, MAX_VIDEOS);
+
+// Fonction pour extraire l'ID YouTube à partir d'une URL
+function getYouTubeId(url) {
+	const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+	const match = url.match(regExp);
+	return (match && match[2].length === 11) ? match[2] : null;
+}
 ---
 
-<PageLayout meta={{ title: "Home" }}>
+<PageLayout meta={{ title: "Accueil" }}>
 	<!-- Hero section -->
 	<!-- Background blur -->
 	<div class="absolute top-0 left-1/2 md:top-[-15%] -ml-[50vw] min-h-screen w-screen pointer-events-none blur-3xl opacity-50 overflow-x-hidden">
@@ -32,98 +35,118 @@ const latestNotes = allNotes.sort(collectionDateSort).slice(0, MAX_NOTES);
 	<section class="max-w-xl mx-auto relative flex items-center justify-center h-screen -mt-24">
 		<div class="w-full text-center">
 			<span class="title text-3xl bg-gradient-to-r from-accent-two/85 via-accent-one/85 to-accent-two/85 dark:from-accent-two dark:via-accent-one dark:to-accent-two bg-clip-text text-transparent">
-				Introducing Astro Citrus!
+				RHDP Breaking News
 			</span>
 			<p class="mt-4 mb-4 text-lg font-medium">
-				Hi, I’m an Astro theme for building websites or blogs. To customize, add posts, or make it yours, click the GitHub icon below to visit my repo.
+				L'information politique, économique et culturelle de la Côte d'Ivoire
 			</p>
 			<div class="flex justify-center mb-4">
 				<SocialList />
 			</div>
 			<div class="flex justify-center space-x-4 mt-4">
-				<a href="/posts/" class="relative flex items-center justify-center h-8 px-4 rounded-lg shadow-lg hover:brightness-110 transition-all bg-gradient-to-r from-accent-one to-accent-two">
+				<a href="/actualites" class="relative flex items-center justify-center h-8 px-4 rounded-lg shadow-lg hover:brightness-110 transition-all bg-gradient-to-r from-accent-one to-accent-two">
 					<span class="text-bgColor font-semibold">
-						Read Blog
+						Actualités
 					</span>
 				</a>
 
-				<a href="/notes/wake-up/" class="relative flex items-center justify-center h-8 px-4 rounded-lg shadow-lg bg-special-lighter hover:brightness-110 hover:bg-special-lightest">
+				<a href="/videos" class="relative flex items-center justify-center h-8 px-4 rounded-lg shadow-lg bg-special-lighter hover:brightness-110 hover:bg-special-lightest">
 					<span class="bg-clip-text text-transparent font-semibold bg-gradient-to-r from-accent-one to-accent-two">
-						Wake up
+						Vidéos
 					</span>
 				</a>
 			</div>
 		</div>
 	</section>
 
-	<!-- Posts Section -->
-	<section aria-label="Blog post list" class="'mt-[-100vh] pt-[100vh]'">
-		<h2 class="title mb-6 text-xl text-accent-two">
-			<a href="/posts/">Posts</a>
-		</h2>
-		<ul class="space-y-4 md:space-y-2" role="list">
-			{
-				allPostsByDate.map((p) => (
-					<li class="gap-2 sm:grid-cols-[auto_1fr]">
-						<PostPreview post={p} />
-					</li>
-				))
-			}
-		</ul>
+	<!-- Dernières actualités Section -->
+	<section aria-label="Dernières actualités" class="'mt-[-100vh] pt-[100vh]'">
+		<div class="flex justify-between items-center mb-6">
+			<h2 class="title text-xl text-accent-two">Dernières actualités</h2>
+			<a href="/actualites" class="text-accent-base hover:text-accent-two text-sm font-medium">Voir toutes →</a>
+		</div>
+
+		{latestActualites.length === 0 ? (
+			<p>Aucun article pour le moment...</p>
+		) : (
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+				{latestActualites.map((article) => (
+					<div class="flex flex-col h-full bg-special-lightest rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
+						{article.data.image && (
+							<img 
+								src={article.data.image} 
+								alt={article.data.title}
+								class="w-full h-44 object-cover"
+							/>
+						)}
+						<div class="p-4 flex-grow flex flex-col">
+							<h3 class="font-semibold text-accent-two mb-2">
+								<a href={`/actualites/${article.slug}`} class="hover:underline">
+									{article.data.title}
+								</a>
+							</h3>
+							<p class="text-xs text-light mb-2">
+								{article.data.category} | Par {article.data.author}
+							</p>
+							<p class="text-sm mb-4 flex-grow">
+								{article.data.summary.length > 120 
+									? article.data.summary.slice(0, 120) + '...' 
+									: article.data.summary
+								}
+							</p>
+							<a 
+								href={`/actualites/${article.slug}`} 
+								class="self-start text-sm text-accent-two hover:underline font-medium mt-auto"
+							>
+								Lire la suite →
+							</a>
+						</div>
+					</div>
+				))}
+			</div>
+		)}
 	</section>
 
-	<!-- Notes Section -->
-	{
-		latestNotes.length > 0 && (
-			<section class="mt-12">
-				<h2 class="title mb-6 text-accent-two">
-					<a href="/notes/">Notes</a>
-				</h2>
-				<div class="grid grid-cols-1 gap-8 sm:grid-cols-2">
-					{
-						latestNotes.map((note) => (
-							<div>
-								<Note note={note} as="h4" isPreview />
+	<!-- Videos Section -->
+	{latestVideos.length > 0 && (
+		<section class="mt-12">
+			<div class="flex justify-between items-center mb-6">
+				<h2 class="title text-xl text-accent-two">Dernières vidéos</h2>
+				<a href="/videos" class="text-accent-base hover:text-accent-two text-sm font-medium">Voir toutes →</a>
+			</div>
+			
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+				{latestVideos.map((video) => {
+					const youtubeId = getYouTubeId(video.data.youtube);
+					return (
+						<div class="bg-special-lightest rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
+							<div class="relative pt-[56.25%]">
+								{youtubeId ? (
+									<iframe 
+										src={`https://www.youtube.com/embed/${youtubeId}`}
+										title={video.data.title}
+										allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+										allowfullscreen
+										class="absolute top-0 left-0 w-full h-full"
+									></iframe>
+								) : (
+									<img 
+										src={video.data.thumbnail} 
+										alt={video.data.title}
+										class="absolute top-0 left-0 w-full h-full object-cover"
+									/>
+								)}
 							</div>
-						))
-					}
-				</div>
-			</section>
-		)
-	}
-
-	<!-- Debug -->
-	<!--
-	<div class="flex justify-between flex-wrap gap-y-1.5 mt-6 text-sm font-medium">
-		<div class="text-center content-center h-10 w-10 bg-color-50"><span class="text-textColor">50</span></div>
-		<div class="text-center content-center h-10 w-10 bg-color-75"><span class="text-textColor">75</span></div>
-		<div class="text-center content-center h-10 w-10 bg-color-100"><span class="text-textColor">100</span></div>
-		<div class="text-center content-center h-10 w-10 bg-color-150"><span class="text-textColor">150</span></div>
-		<div class="text-center content-center h-10 w-10 bg-color-200"><span class="text-textColor">200</span></div>
-		<div class="text-center content-center h-10 w-10 bg-color-250"><span class="text-textColor">250</span></div>
-		<div class="text-center content-center h-10 w-10 bg-color-300"><span class="text-textColor">300</span></div>
-		<div class="text-center content-center h-10 w-10 bg-color-350"><span class="text-textColor">350</span></div>
-		<div class="text-center content-center h-10 w-10 bg-color-400">
-			<span class="text-textColor">400</span>
-			<span class="text-bgColor">400</span>
-		</div>
-		<div class="text-center content-center h-10 w-10 bg-color-450">
-			<span class="text-textColor">450</span>
-			<span class="text-bgColor">450</span>
-		</div>
-		<div class="text-center content-center h-10 w-10 bg-color-500">
-			<span class="text-textColor">500</span>
-			<span class="text-bgColor">500</span>
-		</div>
-		<div class="text-center content-center h-10 w-10 bg-color-550"><span class="text-bgColor">550</span></div>
-		<div class="text-center content-center h-10 w-10 bg-color-600"><span class="text-bgColor">600</span></div>
-		<div class="text-center content-center h-10 w-10 bg-color-650"><span class="text-bgColor">650</span></div>
-		<div class="text-center content-center h-10 w-10 bg-color-700"><span class="text-bgColor">700</span></div>
-		<div class="text-center content-center h-10 w-10 bg-color-750"><span class="text-bgColor">750</span></div>
-		<div class="text-center content-center h-10 w-10 bg-color-800"><span class="text-bgColor">800</span></div>
-		<div class="text-center content-center h-10 w-10 bg-color-850"><span class="text-bgColor">850</span></div>
-		<div class="text-center content-center h-10 w-10 bg-color-900"><span class="text-bgColor">900</span></div>
-	</div>
-	-->
+							<div class="p-4">
+								<h3 class="font-semibold text-accent-two mb-2">
+									{video.data.title}
+								</h3>
+							</div>
+						</div>
+					);
+				})}
+			</div>
+		</section>
+	)}
 </PageLayout>
 

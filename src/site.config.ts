@@ -5,7 +5,7 @@ export const siteConfig: SiteConfig = {
 	author: "Artem Kutsan",
 	// Date.prototype.toLocaleDateString() parameters, found in src/utils/date.ts.
 	date: {
-		locale: "en-GB",
+		locale: "fr-FR",
 		options: {
 			day: "numeric",
 			month: "short",
@@ -13,11 +13,11 @@ export const siteConfig: SiteConfig = {
 		},
 	},
 	// Used as the default description meta property and webmanifest description
-	description: "An opinionated starter theme for Astro",
+	description: "Un thème de démarrage opinionné pour Astro",
 	// HTML lang property, found in src/layouts/Base.astro L:18 & astro.config.ts L:48
-	lang: "en-GB",
+	lang: "fr-FR",
 	// Meta property, found in src/components/BaseHead.astro L:42
-	ogLocale: "en_GB",
+	ogLocale: "fr_FR",
 	// Used to construct the meta title property found in src/components/BaseHead.astro L:11, and webmanifest name found in astro.config.ts L:42
 	title: "Citrus",
 };
@@ -26,18 +26,26 @@ export const siteConfig: SiteConfig = {
 export const menuLinks: { path: string; title: string }[] = [
 	{
 		path: "/",
-		title: "Home",
+		title: "Accueil",
 	},
 	{
-		path: "/about/",
-		title: "About",
+		path: "/actualites",
+		title: "Actualités",
 	},
 	{
-		path: "/posts/",
-		title: "Blog",
+		path: "/videos",
+		title: "Vidéos",
 	},
 	{
-		path: "/notes/",
-		title: "Notes",
+		path: "/a-propos",
+		title: "À propos",
+	},
+	{
+		path: "/contact",
+		title: "Contact",
+	},
+	{
+		path: "/recherche",
+		title: "Recherche",
 	},
 ];
